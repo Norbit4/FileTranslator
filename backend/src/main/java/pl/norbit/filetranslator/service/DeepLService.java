@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 public class DeepLService {
-    private final  WebClient webClient = WebClient.create("https://api-free.deepl.com/v2");
+    private final WebClient webClient = WebClient.create("https://api-free.deepl.com/v2");
     private final ObjectMapper mapper = new ObjectMapper();
     private final String BODY_TEMPLATE =
             """

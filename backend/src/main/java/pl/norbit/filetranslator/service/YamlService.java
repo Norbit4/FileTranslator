@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,18 +46,33 @@ public class YamlService {
     }
 
     public byte [] translateFile(List<TranslateGroup> groups) throws IOException {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new LinkedHashMap<>();
 
         for (TranslateGroup group : groups) {
             List<FileLine> lines = group.getLines();
 
             for (FileLine line : lines) {
-                map.put(line.getKey(), line.getTranslate());
+                String[] split = line.getKey().split("\\.");
+
+                if(split.length != 1) {
+                    HashMap<Object, Object> objectObjectHashMap = new LinkedHashMap<>();
+
+                    objectObjectHashMap.put(split[1], line.getTranslate());
+
+                    map.put(split[0], objectObjectHashMap);
+                }else {
+                    map.put(line.getKey(), line.getTranslate());
+                }
+
+//
+//                map.put(line.getKey(), line.getTranslate());
             }
         }
 
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setAllowUnicode(true);
+        options.setPrettyFlow(true);
 
         Yaml newYaml = new Yaml(options);
 

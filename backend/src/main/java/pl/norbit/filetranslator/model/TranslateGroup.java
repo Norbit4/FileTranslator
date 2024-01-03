@@ -1,6 +1,7 @@
 package pl.norbit.filetranslator.model;
 
 import lombok.Data;
+import pl.norbit.filetranslator.enums.SizeStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +19,12 @@ public class TranslateGroup {
         lines.get(index).setTranslate(translate);
     }
 
-    public Status addLine(FileLine line) {
+    public SizeStatus addLine(FileLine line) {
         // 50 strings is max for one request in DeepL
-        if(lines.size() == 50) return Status.FULL;
+        if(lines.size() == 50) return SizeStatus.FULL;
 
         lines.add(line);
 
-        return Status.OK;
+        return SizeStatus.OK;
     }
 }

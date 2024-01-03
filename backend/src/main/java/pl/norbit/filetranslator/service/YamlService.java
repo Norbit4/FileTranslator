@@ -38,36 +38,16 @@ public class YamlService {
 
             if (value instanceof Map) {
                 setupContent((Map<String, Object>) value, keyPath, fileContent);
-            }else {
+            } else {
                 fileContent.addLine(new FileLine(keyPath, value.toString()));
             }
         }
         return fileContent;
     }
 
-    public byte [] translateFile(List<TranslateGroup> groups) throws IOException {
-        Map<String, Object> map = new LinkedHashMap<>();
+    public byte[] translateFile(List<TranslateGroup> groups) throws IOException {
 
-        for (TranslateGroup group : groups) {
-            List<FileLine> lines = group.getLines();
-
-            for (FileLine line : lines) {
-                String[] split = line.getKey().split("\\.");
-
-                if(split.length != 1) {
-                    HashMap<Object, Object> objectObjectHashMap = new LinkedHashMap<>();
-
-                    objectObjectHashMap.put(split[1], line.getTranslate());
-
-                    map.put(split[0], objectObjectHashMap);
-                }else {
-                    map.put(line.getKey(), line.getTranslate());
-                }
-
-//
-//                map.put(line.getKey(), line.getTranslate());
-            }
-        }
+        Map<String, Object> map = getFileMap(groups);
 
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -80,6 +60,42 @@ public class YamlService {
              Writer writer = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8)) {
             newYaml.dump(map, writer);
             return byteArrayOutputStream.toByteArray();
+        }
+    }
+
+    private Map<String, Object> getFileMap(List<TranslateGroup> groups) {
+        Map<String, Object> map = new LinkedHashMap<>();
+
+        groups.stream()
+                .flatMap(group -> group.getLines().stream())
+                .forEach(fileLine -> mapLine(map, fileLine));
+        return map;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private void mapLine(Map<String, Object> map, FileLine line) {
+        String[] split = line.getKey().split("\\.");
+
+        if (split.length > 1) {
+            Map<String, Object> currentMap = map;
+
+            for (int i = 0; i < split.length - 1; i++) {
+                String key = split[i];
+
+                if (!currentMap.containsKey(key)) {
+                    HashMap<String, Object> newMap = new LinkedHashMap<>();
+                    currentMap.put(key, newMap);
+                    currentMap = newMap;
+                } else {
+                    currentMap = (HashMap<String, Object>) currentMap.get(key);
+                }
+            }
+
+            String lastKey = split[split.length - 1];
+            currentMap.put(lastKey, line.getTranslate());
+        } else {
+            map.put(line.getKey(), line.getTranslate());
         }
     }
 }

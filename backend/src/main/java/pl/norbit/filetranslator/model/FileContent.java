@@ -1,6 +1,7 @@
 package pl.norbit.filetranslator.model;
 
 import lombok.Data;
+import pl.norbit.filetranslator.enums.SizeStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,9 @@ public class FileContent {
             groups.add(group);
         }
 
-        Status status = group.addLine(line);
+        SizeStatus status = group.addLine(line);
 
-        if(status != Status.FULL) return;
+        if(status != SizeStatus.FULL) return;
 
         TranslateGroup translateGroup = new TranslateGroup();
 

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import pl.norbit.filetranslator.model.TranslateInfo;
 import pl.norbit.filetranslator.service.FileService;
 
 
@@ -30,10 +31,12 @@ public class FileController {
 
         if(!contentType.equals("text/yaml")) return new ResponseEntity<>("File is not accepted", HttpStatus.BAD_REQUEST);
 
-        byte[] bytes = fileService.translateFile(file);
+        TranslateInfo translateInfo = fileService.translateFile(file);
+
+        if(translateInfo.getStatus() == null) return new ResponseEntity<>("Error while translating", HttpStatus.INTERNAL_SERVER_ERROR);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"file.yml\"")
-                .body(bytes);
+                .body(translateInfo.getFile());
     }
 }

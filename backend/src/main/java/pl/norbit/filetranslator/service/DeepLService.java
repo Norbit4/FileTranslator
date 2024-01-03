@@ -25,23 +25,17 @@ public class DeepLService {
                 }
             """;
 
-    public void translate(TranslateGroup group)  {
+    public void translate(TranslateGroup group) throws JsonProcessingException {
         List<FileLine> lines = group.getLines();
 
         List<String> list = new ArrayList<>();
 
         for (FileLine line : lines) list.add(line.getText());
 
-        try {
-            List<String> translate = translate(list);
+        List<String> translate = translate(list);
 
-            for (int i = 0; i < translate.size(); i++) group.addTranslate(i, translate.get(i));
+        for (int i = 0; i < translate.size(); i++) group.addTranslate(i, translate.get(i));
 
-//            return group;
-
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private List<String> translate(List<String> list) throws JsonProcessingException {

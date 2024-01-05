@@ -39,7 +39,7 @@ public class YamlService {
             if (value instanceof Map) {
                 setupContent((Map<String, Object>) value, keyPath, fileContent);
             } else {
-                fileContent.addLine(new FileLine(keyPath, value.toString()));
+                fileContent.addLine(new FileLine(keyPath, String.valueOf(value)));
             }
         }
         return fileContent;

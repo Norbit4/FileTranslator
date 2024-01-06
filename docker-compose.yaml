@@ -1,0 +1,31 @@
+version: "1.1"
+services:
+  mongoDB:
+    image: mongo
+    container_name: mongoDB
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - "./data/mongoDB:/data/db"
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    links:
+      - mongoDB
+    ports:
+      - "8080:8080"  
+    depends_on:
+      - mongoDB
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    restart: always
+    links:
+      - backend
+    ports:
+      - "3000:3000"  
+    depends_on:
+      - backend
+  

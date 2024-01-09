@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class FileLine {
+
     private String key;
     private String text;
     private String translate;

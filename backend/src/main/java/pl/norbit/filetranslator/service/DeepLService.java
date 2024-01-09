@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import pl.norbit.filetranslator.model.FileContent;
 import pl.norbit.filetranslator.model.FileLine;
 import pl.norbit.filetranslator.model.TranslateGroup;
 
@@ -24,8 +25,13 @@ public class DeepLService {
                   "source_lang": "EN"
                 }
             """;
+    public void translate(FileContent fileContent) throws JsonProcessingException {
+        List<TranslateGroup> groups = fileContent.getGroups();
 
-    public void translate(TranslateGroup group) throws JsonProcessingException {
+        for (TranslateGroup group : groups) translate(group);
+    }
+
+    private void translate(TranslateGroup group) throws JsonProcessingException {
         List<FileLine> lines = group.getLines();
 
         List<String> list = new ArrayList<>();

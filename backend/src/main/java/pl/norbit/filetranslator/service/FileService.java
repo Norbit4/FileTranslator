@@ -4,12 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.norbit.filetranslator.model.FileContent;
-import pl.norbit.filetranslator.model.TranslateGroup;
 import pl.norbit.filetranslator.model.TranslateInfo;
 import pl.norbit.filetranslator.enums.TranslateStatus;
 
 import java.io.*;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -18,14 +16,21 @@ public class FileService {
     private YamlService yamlService;
 
     public TranslateInfo translateFile(MultipartFile file) {
+
+        if(file == null || file.isEmpty()) return new TranslateInfo(TranslateStatus.FILE_IS_EMPTY, null);
+
+        String contentType = file.getContentType();
+
+        if(contentType == null || contentType.isEmpty()) return new TranslateInfo(TranslateStatus.FILE_IS_EMPTY, null);
+
+        if(!contentType.equals("text/yaml")) return new TranslateInfo(TranslateStatus.NOT_ACCEPTED, null);
+
         try {
-            FileContent fileContent = yamlService.getContent(file);
+            FileContent fileContent = yamlService.formatFileToFileContent(file);
 
-            List<TranslateGroup> groups = fileContent.getGroups();
+            deepLService.translate(fileContent);
 
-            for (TranslateGroup group : groups) deepLService.translate(group);
-
-            byte[] content = yamlService.translateFile(groups);
+            byte[] content = yamlService.formatFileContentToByte(fileContent);
 
             return new TranslateInfo(TranslateStatus.SUCCESS, content);
         } catch (IOException e) {

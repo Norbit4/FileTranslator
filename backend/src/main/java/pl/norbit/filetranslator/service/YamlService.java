@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import pl.norbit.filetranslator.exception.FileReadException;
+import pl.norbit.filetranslator.exception.FileWriteException;
 import pl.norbit.filetranslator.model.FileContent;
 import pl.norbit.filetranslator.model.FileLine;
 import pl.norbit.filetranslator.model.TranslateGroup;
@@ -20,13 +22,17 @@ import java.util.Map;
 @Service
 public class YamlService {
 
-    public FileContent formatFileToFileContent(MultipartFile file) throws IOException {
+    public FileContent formatFileToFileContent(MultipartFile file)  {
         Yaml yaml = new Yaml();
-        Map<String, Object> map = yaml.load(file.getInputStream());
+        Map<String, Object> map;
+        try {
+            map = yaml.load(file.getInputStream());
+        } catch (IOException e) {
+            throw new FileReadException(e.getMessage());
+        }
 
         return setupContent(map, "", new FileContent());
     }
-
     @SuppressWarnings("unchecked")
     public static FileContent setupContent(Map<String, Object> map, String path, FileContent fileContent) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -44,7 +50,7 @@ public class YamlService {
         return fileContent;
     }
 
-    public byte[] formatFileContentToByte(FileContent fileContent) throws IOException {
+    public byte[] formatTranslateFileContentToByte(FileContent fileContent)  {
 
         List<TranslateGroup> groups = fileContent.getGroups();
 
@@ -61,6 +67,8 @@ public class YamlService {
              Writer writer = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.UTF_8)) {
             newYaml.dump(map, writer);
             return byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw new FileWriteException(e.getMessage());
         }
     }
 

@@ -3,38 +3,29 @@ package pl.norbit.filetranslator.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import pl.norbit.filetranslator.exception.FileException;
 import pl.norbit.filetranslator.model.FileContent;
-import pl.norbit.filetranslator.model.TranslateInfo;
-import pl.norbit.filetranslator.enums.TranslateStatus;
-
-import java.io.*;
 
 @Service
 @AllArgsConstructor
 public class FileService {
-    private DeepLService deepLService;
-    private YamlService yamlService;
+    private final DeepLService deepLService;
+    private final YamlService yamlService;
 
-    public TranslateInfo translateFile(MultipartFile file) {
+    public byte[] translateFile(MultipartFile file) {
 
-        if(file == null || file.isEmpty()) return new TranslateInfo(TranslateStatus.FILE_IS_EMPTY, null);
+        if(file == null || file.isEmpty()) throw new FileException("File is empty!");
 
         String contentType = file.getContentType();
 
-        if(contentType == null || contentType.isEmpty()) return new TranslateInfo(TranslateStatus.FILE_IS_EMPTY, null);
+        if(contentType == null || contentType.isEmpty()) throw new FileException("File type is empty!");
 
-        if(!contentType.equals("text/yaml")) return new TranslateInfo(TranslateStatus.NOT_ACCEPTED, null);
+        if(!contentType.equals("text/yaml")) throw new FileException("This file type is not accepted!");
 
-        try {
-            FileContent fileContent = yamlService.formatFileToFileContent(file);
+        FileContent fileContent = yamlService.formatFileToFileContent(file);
 
-            deepLService.translate(fileContent);
+        deepLService.translate(fileContent);
 
-            byte[] content = yamlService.formatFileContentToByte(fileContent);
-
-            return new TranslateInfo(TranslateStatus.SUCCESS, content);
-        } catch (IOException e) {
-            return new TranslateInfo(TranslateStatus.ERROR, null);
-        }
+        return yamlService.formatTranslateFileContentToByte(fileContent);
     }
 }

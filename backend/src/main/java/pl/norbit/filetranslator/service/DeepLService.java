@@ -25,13 +25,13 @@ public class DeepLService {
                   "source_lang": "EN"
                 }
             """;
-    public void translate(FileContent fileContent) throws JsonProcessingException {
+    public void translate(FileContent fileContent) {
         List<TranslateGroup> groups = fileContent.getGroups();
 
         for (TranslateGroup group : groups) translate(group);
     }
 
-    private void translate(TranslateGroup group) throws JsonProcessingException {
+    private void translate(TranslateGroup group) {
         List<FileLine> lines = group.getLines();
 
         List<String> list = new ArrayList<>();
@@ -44,7 +44,7 @@ public class DeepLService {
 
     }
 
-    private List<String> translate(List<String> list) throws JsonProcessingException {
+    private List<String> translate(List<String> list) {
         String body = String.format(BODY_TEMPLATE, formatList(list));
 
         String result = webClient.post()
@@ -69,8 +69,13 @@ public class DeepLService {
         return builder;
     }
 
-    private List<String> formatBody(String body) throws JsonProcessingException {
-        JsonNode json = mapper.readTree(body);
+    private List<String> formatBody(String body)  {
+        JsonNode json;
+        try {
+            json = mapper.readTree(body);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         JsonNode translations = json.path("translations");
 
         List<String> textList = new ArrayList<>();

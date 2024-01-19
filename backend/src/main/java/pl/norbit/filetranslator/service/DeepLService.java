@@ -36,12 +36,11 @@ public class DeepLService {
 
         List<String> list = new ArrayList<>();
 
-        for (FileLine line : lines) list.add(line.getText());
+        for (FileLine line : lines) list.add(line.getToTranslate().toString());
 
         List<String> translate = translate(list);
 
         for (int i = 0; i < translate.size(); i++) group.addTranslate(i, translate.get(i));
-
     }
 
     private List<String> translate(List<String> list) {

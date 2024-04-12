@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.norbit.filetranslator.exception.FileException;
-import pl.norbit.filetranslator.model.FileContent;
+import pl.norbit.filetranslator.model.file.FileContent;
 
 @Service
 @AllArgsConstructor

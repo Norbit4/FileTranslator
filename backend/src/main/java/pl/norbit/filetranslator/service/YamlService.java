@@ -6,9 +6,8 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import pl.norbit.filetranslator.exception.FileReadException;
 import pl.norbit.filetranslator.exception.FileWriteException;
-import pl.norbit.filetranslator.model.FileContent;
-import pl.norbit.filetranslator.model.FileLine;
-import pl.norbit.filetranslator.model.TranslateGroup;
+import pl.norbit.filetranslator.model.file.FileContent;
+import pl.norbit.filetranslator.model.file.FileObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +30,7 @@ public class YamlService {
             throw new FileReadException(e.getMessage());
         }
 
-        return setupContent(map, "", new FileContent());
+        return setupContent(map, "", new FileContent(file.getName()));
     }
     @SuppressWarnings("unchecked")
     public static FileContent setupContent(Map<String, Object> map, String path, FileContent fileContent) {
@@ -44,17 +43,16 @@ public class YamlService {
             if (value instanceof Map) {
                 setupContent((Map<String, Object>) value, keyPath, fileContent);
             } else {
-                fileContent.addLine(new FileLine(keyPath, value));
+                fileContent.addFileObject(keyPath, value);
             }
         }
         return fileContent;
     }
 
     public byte[] formatTranslateFileContentToByte(FileContent fileContent)  {
+        List<FileObject> fileObjects = fileContent.getFileObjects();
 
-        List<TranslateGroup> groups = fileContent.getGroups();
-
-        Map<String, Object> map = getFileMap(groups);
+        Map<String, Object> map = getFileMap(fileObjects);
 
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -72,17 +70,16 @@ public class YamlService {
         }
     }
 
-    private Map<String, Object> getFileMap(List<TranslateGroup> groups) {
+    private Map<String, Object> getFileMap(List<FileObject> groups) {
         Map<String, Object> map = new LinkedHashMap<>();
 
-        groups.stream()
-                .flatMap(group -> group.getLines().stream())
-                .forEach(fileLine -> mapLine(map, fileLine));
+        groups.forEach(fileLine -> mapLine(map, fileLine));
+
         return map;
     }
 
     @SuppressWarnings("unchecked")
-    private void mapLine(Map<String, Object> map, FileLine line) {
+    private void mapLine(Map<String, Object> map, FileObject line) {
         String[] split = line.getKey().split("\\.");
 
         Map<String, Object> currentMap = map;

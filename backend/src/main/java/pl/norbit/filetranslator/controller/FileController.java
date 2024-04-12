@@ -16,7 +16,7 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> Upload(@RequestParam("file") MultipartFile file){
+    public ResponseEntity<byte[]> translate(@RequestParam("file") MultipartFile file){
         byte[] body = fileService.translateFile(file);
 
         return ResponseEntity.ok()

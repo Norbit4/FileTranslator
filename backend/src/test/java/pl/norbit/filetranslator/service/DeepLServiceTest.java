@@ -1,48 +1,88 @@
 package pl.norbit.filetranslator.service;
 
-import org.junit.jupiter.api.BeforeEach;
+import io.github.cdimascio.dotenv.Dotenv;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import pl.norbit.filetranslator.model.FileContent;
-import pl.norbit.filetranslator.model.FileLine;
+import pl.norbit.filetranslator.model.TranslateGroup;
+import pl.norbit.filetranslator.model.file.FileContent;
+import pl.norbit.filetranslator.model.file.FileObject;
+import pl.norbit.filetranslator.utils.FileContentUtils;
 
+import java.util.List;
+
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+import static pl.norbit.filetranslator.helper.TranslateGroupHelper.getTranslateGroups;
 
 @SpringBootTest
 class DeepLServiceTest {
+    @Mock
+    private FileContentUtils fileContentUtils;
 
-    private DeepLService onTest;
+    @Mock
+    private Dotenv dotenv;
 
-    @BeforeEach
-    void setUp() {
-        onTest = new DeepLService();
+    @Test
+    @DisplayName("Should success initialize")
+    void should_success_initialize() {
+        when(dotenv.get("DEEPL_URL")).thenReturn("https://api-free.deepl.com/v2");
+        when(dotenv.get("DEEPL_ACCESS_TOKEN")).thenReturn("your_access_token");
+
+        assertDoesNotThrow(() -> new DeepLService(fileContentUtils, dotenv));
     }
 
     @Test
-    void itShouldTranslate() {
+    @DisplayName("Should throw exception when DEEPL_URL is not set")
+    void should_throw_exception_when_DEEPL_URL_is_not_set() {
+        when(dotenv.get("DEEPL_URL")).thenReturn(null);
+        when(dotenv.get("DEEPL_ACCESS_TOKEN")).thenReturn("your_access_token");
+
+        assertThrows(IllegalArgumentException.class, () -> new DeepLService(fileContentUtils, dotenv));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when DEEPL_ACCESS_TOKEN is not set")
+    void should_throw_exception_when_DEEPL_ACCESS_TOKEN_is_not_set() {
+        when(dotenv.get("DEEPL_URL")).thenReturn("https://api-free.deepl.com/v2");
+        when(dotenv.get("DEEPL_ACCESS_TOKEN")).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class, () -> new DeepLService(fileContentUtils, dotenv));
+    }
+
+    @Test
+    @Disabled
+    @DisplayName("Should translate FileContent")
+    void should_translate_FileContent() {
         //given
-        FileContent fileContent = new FileContent();
+        String deeplUrl = "https://api-free.deepl.com/v2";
+        String deeplAccessToken = "your_access_token"; //replace with your access token and remove @Disabled annotation
 
-        FileLine line1 = new FileLine("key1", "cat");
-        FileLine line2 = new FileLine("key2", "car");
+        FileContent fileContent = new FileContent("animals");
 
-        fileContent.addLine(line1);
-        fileContent.addLine(line2);
+        fileContent.addFileObject("key1", "dog");
+        fileContent.addFileObject("key2", "cat");
 
-        FileContent expectedFileContent = new FileContent();
-        FileLine expectedLine1 = new FileLine("key1", "cat");
-        FileLine expectedLine2 = new FileLine("key2", "car");
+        List<TranslateGroup> translateGroups = getTranslateGroups(fileContent);
 
-        expectedLine1.setTranslate("kot");
-        expectedLine2.setTranslate("samochód");
+        when(fileContentUtils.getTranslateGroups(fileContent)).thenReturn(translateGroups);
+        when(dotenv.get("DEEPL_URL")).thenReturn(deeplUrl);
+        when(dotenv.get("DEEPL_ACCESS_TOKEN")).thenReturn(deeplAccessToken);
 
-        expectedFileContent.addLine(expectedLine1);
-        expectedFileContent.addLine(expectedLine2);
+        DeepLService deepLService = new DeepLService(fileContentUtils, dotenv);
 
         //when
-        onTest.translate(fileContent);
+        deepLService.translate(fileContent);
 
         //then
-        assertEquals(expectedFileContent, fileContent);
+        List<FileObject> actualObjects = fileContent.getFileObjects();
+
+        assertEquals(2, actualObjects.size());
+        assertEquals("pies", actualObjects.get(0).getTranslateValue());
+        assertEquals("kot", actualObjects.get(1).getTranslateValue());
     }
 }

@@ -1,23 +1,13 @@
-version: "1.1"
 services:
-  mongoDB:
-    image: mongo
-    container_name: mongoDB
-    restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - "./data/mongoDB:/data/db"
   backend:
     build: ./backend
     container_name: backend
     restart: always
-    links:
-      - mongoDB
     ports:
       - "8080:8080"  
-    depends_on:
-      - mongoDB
+    environment:
+        DEEPL_URL: https://api-free.deepl.com/v2
+        DEEPL_ACCESS_TOKEN: YOUR_ACCES_TOKEN
   frontend:
     build: ./frontend
     container_name: frontend

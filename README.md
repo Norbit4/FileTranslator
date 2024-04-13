@@ -30,6 +30,7 @@ key2: translated_value2
 - [Run](#run)
 - [App view](#view)
 - [Example usage](#usage)
+- [Tests](#tests)
 
 <h2 align="left" id="run">Run</h2>
 
@@ -103,5 +104,12 @@ market-gui:
     - ''
     - '&eKliknij, aby przeglądać!'
 ```
+
+<div align="right"><a href="#content">Back to top</a></div>
+
+<h2 align="left" id="tests">Tests</h2>
+
+![tests](https://github.com/Norbit4/FileTranslator/assets/46154743/65a6b1ee-29b5-40e6-b8a8-75745ea49de8)
+
 
 <div align="right"><a href="#content">Back to top</a></div>

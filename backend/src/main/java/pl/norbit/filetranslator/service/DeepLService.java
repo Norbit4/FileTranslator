@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.norbit.filetranslator.exception.JsonException;
+import pl.norbit.filetranslator.model.Language;
 import pl.norbit.filetranslator.model.TranslateGroup;
 import pl.norbit.filetranslator.model.TranslateRequest;
 import pl.norbit.filetranslator.model.file.FileContent;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Log
 @Service
 public class DeepLService {
     private final WebClient webClient;
@@ -39,13 +39,11 @@ public class DeepLService {
             throw new IllegalArgumentException("DEEPL_URL or DEEPL_ACCESS_TOKEN is not set");
         }
 
-        log.info("DeepLService initialized with url: " + deeplUrl + " and access token: " + deeplAccessToken);
-
         this.mapper = new ObjectMapper();
         this.webClient = WebClient.create(deeplUrl);
     }
 
-    public void translate(FileContent fileContent) {
+    public void translate(FileContent fileContent, Language targetLanguage) {
         List<TranslateGroup> groups = fileUtils.getTranslateGroups(fileContent);
 
         for (TranslateGroup translateGroup : groups) {
@@ -57,7 +55,7 @@ public class DeepLService {
                     .map(ToTranslate::getDefault)
                     .toList();
 
-            List<String> translate = translate(list);
+            List<String> translate = translate(list, targetLanguage);
 
             for (int i = 0; i < translate.size(); i++) {
                 UUID id = translateRequests.get(i).id();
@@ -66,16 +64,15 @@ public class DeepLService {
         }
     }
 
-    private List<String> translate(List<String> list) {
+    private List<String> translate(List<String> list, Language targetLanguage) {
         String template = """
                     {
                       "text": [%s],
-                      "target_lang": "PL",
-                      "source_lang": "EN"
+                      "target_lang": "%s"
                     }
                 """;
 
-        String body = String.format(template, formatList(list));
+        String body = String.format(template, formatList(list), targetLanguage.name());
         String authorization = "DeepL-Auth-Key " + deeplAccessToken;
 
         String result = webClient.post()

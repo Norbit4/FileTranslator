@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import pl.norbit.filetranslator.model.Language;
 import pl.norbit.filetranslator.model.TranslateGroup;
 import pl.norbit.filetranslator.model.file.FileContent;
 import pl.norbit.filetranslator.model.file.FileObject;
@@ -76,7 +77,7 @@ class DeepLServiceTest {
         DeepLService deepLService = new DeepLService(fileContentUtils, dotenv);
 
         //when
-        deepLService.translate(fileContent);
+        deepLService.translate(fileContent, Language.PL);
 
         //then
         List<FileObject> actualObjects = fileContent.getFileObjects();

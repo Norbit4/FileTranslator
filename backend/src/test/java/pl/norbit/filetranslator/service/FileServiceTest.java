@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import pl.norbit.filetranslator.exception.FileException;
+import pl.norbit.filetranslator.model.Language;
 import pl.norbit.filetranslator.model.file.FileContent;
 
 import java.nio.charset.StandardCharsets;
@@ -40,7 +41,7 @@ class FileServiceTest {
         when(yamlService.formatTranslateFileContentToByte(fileContent)).thenReturn(new byte[1]);
 
         //when
-        byte[] bytes = underTest.translateFile(mockFile);
+        byte[] bytes = underTest.translateFile(mockFile, Language.PL);
 
         //then
         assertNotNull(bytes);
@@ -54,7 +55,7 @@ class FileServiceTest {
         MockMultipartFile mockFile = getMultiPartFile("", "test");
 
         //when
-        Exception exception = assertThrows(FileException.class, () -> underTest.translateFile(mockFile));
+        Exception exception = assertThrows(FileException.class, () -> underTest.translateFile(mockFile, Language.PL));
 
         //then
         assertEquals("File is empty!", exception.getMessage());
@@ -72,7 +73,7 @@ class FileServiceTest {
                 yamlContent.getBytes(StandardCharsets.UTF_8));
 
         //when
-        Exception exception = assertThrows(FileException.class, () -> underTest.translateFile(mockFile));
+        Exception exception = assertThrows(FileException.class, () -> underTest.translateFile(mockFile, Language.PL));
 
         //then
         assertEquals("File type is empty!", exception.getMessage());
@@ -90,7 +91,7 @@ class FileServiceTest {
                 yamlContent.getBytes(StandardCharsets.UTF_8));
 
         //when
-        Exception exception = assertThrows(FileException.class, () -> underTest.translateFile(mockFile));
+        Exception exception = assertThrows(FileException.class, () -> underTest.translateFile(mockFile, Language.PL));
 
         //then
         assertEquals("This file type is not accepted!", exception.getMessage());

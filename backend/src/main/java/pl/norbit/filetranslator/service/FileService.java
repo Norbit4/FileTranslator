@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.norbit.filetranslator.exception.FileException;
+import pl.norbit.filetranslator.model.Language;
 import pl.norbit.filetranslator.model.file.FileContent;
 
 @Service
@@ -12,7 +13,7 @@ public class FileService {
     private final DeepLService deepLService;
     private final YamlService yamlService;
 
-    public byte[] translateFile(MultipartFile file) {
+    public byte[] translateFile(MultipartFile file, Language targetLanguage) {
 
         if(file == null || file.isEmpty()) throw new FileException("File is empty!");
 
@@ -24,7 +25,7 @@ public class FileService {
 
         FileContent fileContent = yamlService.formatFileToFileContent(file);
 
-        deepLService.translate(fileContent);
+        deepLService.translate(fileContent, targetLanguage);
 
         return yamlService.formatTranslateFileContentToByte(fileContent);
     }

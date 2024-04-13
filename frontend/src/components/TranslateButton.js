@@ -8,7 +8,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-export default function ({ fileUploaded, fileName, fileContent, setTranslateFile }) {
+const TranslateButton = ({ language, fileUploaded, fileName, fileContent, setTranslateFile }) => {
   const [open, setOpen] = useState(false);
   const [serverity, setServerity] = useState('');
   const [text, setText] = useState('');
@@ -79,13 +79,16 @@ export default function ({ fileUploaded, fileName, fileContent, setTranslateFile
     try {
       const formData = new FormData();
       formData.append('file', new Blob([fileContent], { type: 'text/yaml' }), fileName);
+      formData.append('language', language);
       
-      const response = await fetch('http://localhost:8080/api/upload', {
+      const response = await fetch('http://localhost:8080/api/translate', {
         method: 'POST',
         body: formData,
       });
 
       setLoading(false);
+
+      console.log(response);
 
       if (response.ok) {
         const blob = await response.blob();
@@ -113,6 +116,7 @@ export default function ({ fileUploaded, fileName, fileContent, setTranslateFile
     <Box >
       <Button 
         variant="outlined" 
+        disabled={!fileUploaded || loading}
         onClick={handleClick}>
         Translate
       </Button>
@@ -133,3 +137,5 @@ export default function ({ fileUploaded, fileName, fileContent, setTranslateFile
     </Box>
   );
 }
+
+export default TranslateButton;

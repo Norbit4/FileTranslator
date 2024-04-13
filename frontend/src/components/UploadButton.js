@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { styled } from '@mui/material/styles';
 
-export default function ({ fileUploaded, fileName, setFileContent, setFileName, setFileUploaded, setTranslateFile}) {
+const UploadButton =  ({ fileUploaded, fileName, setFileContent, setFileName, setFileUploaded, setTranslateFile}) => {
 
     const VisuallyHiddenInput = styled('input')({
         clip: 'rect(0 0 0 0)',
@@ -46,7 +46,7 @@ export default function ({ fileUploaded, fileName, setFileContent, setFileName, 
         variant="contained" 
         startIcon={<CloudUploadIcon />} 
         style={{ 
-          // backgroundColor: fileUploaded ? 'green' : 'gray', 
+          backgroundColor: fileUploaded ? '#18bc60' : '#23b5aa', 
           marginBottom: '20px',
           marginTop: '20px' }}>
         
@@ -58,3 +58,5 @@ export default function ({ fileUploaded, fileName, setFileContent, setFileName, 
     </Button>
   );
 }
+
+export default UploadButton;

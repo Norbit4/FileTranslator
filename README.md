@@ -1,5 +1,7 @@
 <h1 align="left"><b>File Translator</b></h1>
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b8c7865c485b45999aa055ff298bda9b)](https://app.codacy.com/gh/Norbit4/FileTranslator/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
 The File Translator project is a tool created to translate files with .yml and .yaml extensions. The main function of app is to translate the values contained in these files, leaving the keys unchanged. This means that the structure of the file remains unchanged, and only the content is modified.
 
 <i>input:</i>
